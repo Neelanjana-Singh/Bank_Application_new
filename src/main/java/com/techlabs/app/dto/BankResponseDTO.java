@@ -4,16 +4,18 @@ public class BankResponseDTO {
 	private Long bankId;
 	private String fullName;
 	private String abbreviation;
+	private boolean isActive; // Newly added variable
 
 	// No-args constructor
 	public BankResponseDTO() {
 	}
 
 	// All-args constructor
-	public BankResponseDTO(Long bankId, String fullName, String abbreviation) {
+	public BankResponseDTO(Long bankId, String fullName, String abbreviation, boolean isActive) {
 		this.bankId = bankId;
 		this.fullName = fullName;
 		this.abbreviation = abbreviation;
+		this.isActive = isActive;
 	}
 
 	// Getters
@@ -29,6 +31,10 @@ public class BankResponseDTO {
 		return abbreviation;
 	}
 
+	public boolean isActive() {
+		return isActive;
+	}
+
 	// Setters
 	public void setBankId(Long bankId) {
 		this.bankId = bankId;
@@ -40,5 +46,9 @@ public class BankResponseDTO {
 
 	public void setAbbreviation(String abbreviation) {
 		this.abbreviation = abbreviation;
+	}
+
+	public void setActive(boolean isActive) {
+		this.isActive = isActive;
 	}
 }

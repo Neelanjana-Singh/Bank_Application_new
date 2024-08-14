@@ -9,63 +9,76 @@ import java.util.List;
 @Table(name = "banks")
 public class Bank {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long bankId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long bankId;
 
-	@NotBlank
-	@Column(nullable = false, unique = true)
-	private String fullName;
+    @NotBlank
+    @Column(nullable = false, unique = true)
+    private String fullName;
 
-	@NotBlank
-	@Column(nullable = false, unique = true)
-	private String abbreviation;
+    @NotBlank
+    @Column(nullable = false, unique = true)
+    private String abbreviation;
 
-	@OneToMany(mappedBy = "bank", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Account> accounts;
+    @Column(nullable = false)
+    private boolean isActive;
 
-	public Long getBankId() {
-		return bankId;
-	}
+    @OneToMany(mappedBy = "bank", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Account> accounts;
 
-	public void setBankId(Long bankId) {
-		this.bankId = bankId;
-	}
+    // Getters and Setters
 
-	public String getFullName() {
-		return fullName;
-	}
+    public Long getBankId() {
+        return bankId;
+    }
 
-	public void setFullName(String fullName) {
-		this.fullName = fullName;
-	}
+    public void setBankId(Long bankId) {
+        this.bankId = bankId;
+    }
 
-	public String getAbbreviation() {
-		return abbreviation;
-	}
+    public String getFullName() {
+        return fullName;
+    }
 
-	public void setAbbreviation(String abbreviation) {
-		this.abbreviation = abbreviation;
-	}
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
 
-	public List<Account> getAccounts() {
-		return accounts;
-	}
+    public String getAbbreviation() {
+        return abbreviation;
+    }
 
-	public void setAccounts(List<Account> accounts) {
-		this.accounts = accounts;
-	}
+    public void setAbbreviation(String abbreviation) {
+        this.abbreviation = abbreviation;
+    }
 
-	public Bank(Long bankId, @NotBlank String fullName, @NotBlank String abbreviation, List<Account> accounts) {
-		super();
-		this.bankId = bankId;
-		this.fullName = fullName;
-		this.abbreviation = abbreviation;
-		this.accounts = accounts;
-	}
+    public boolean isActive() {
+        return isActive;
+    }
 
-	public Bank() {
+    public void setActive(boolean isActive) {
+        this.isActive = isActive;
+    }
 
-	}
+    public List<Account> getAccounts() {
+        return accounts;
+    }
 
+    public void setAccounts(List<Account> accounts) {
+        this.accounts = accounts;
+    }
+
+    // Constructor with isActive parameter
+    public Bank(Long bankId, @NotBlank String fullName, @NotBlank String abbreviation, boolean isActive, List<Account> accounts) {
+        this.bankId = bankId;
+        this.fullName = fullName;
+        this.abbreviation = abbreviation;
+        this.isActive = isActive;
+        this.accounts = accounts;
+    }
+
+    // Default Constructor
+    public Bank() {
+    }
 }

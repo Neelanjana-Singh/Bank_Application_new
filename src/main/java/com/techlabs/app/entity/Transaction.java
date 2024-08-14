@@ -2,84 +2,95 @@ package com.techlabs.app.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Entity
 @Table(name = "transactions")
 public class Transaction {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long transactionId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long transactionId;
 
-	private LocalDateTime transactionTimestamp;
+    private LocalDateTime transactionTimestamp;
 
-	@NotNull
-	@Column(nullable = false)
-	private double amount;
+    @NotNull
+    @Column(nullable = false)
+    private double amount;
 
-	@ManyToOne
-	@JoinColumn(name = "sender_account")
-	private Account senderAccountNumber;
+    @ManyToOne
+    @JoinColumn(name = "sender_account")
+    private Account senderAccountNumber;
 
-	@ManyToOne
-	@JoinColumn(name = "receiver_account")
-	private Account receiverAccountNumber;
+    @ManyToOne
+    @JoinColumn(name = "receiver_account")
+    private Account receiverAccountNumber;
 
-	public Long getTransactionId() {
-		return transactionId;
-	}
+    @Column(nullable = false)
+    private boolean isActive = true; // New field for soft delete
 
-	public void setTransactionId(Long transactionId) {
-		this.transactionId = transactionId;
-	}
+    // No-args constructor
+    public Transaction() {
+    }
 
-	public LocalDateTime getTransactionTimestamp() {
-		return transactionTimestamp;
-	}
+    // All-args constructor
+    public Transaction(Long transactionId, LocalDateTime transactionTimestamp, @NotNull double amount,
+            Account senderAccountNumber, Account receiverAccountNumber, boolean isActive) {
+        this.transactionId = transactionId;
+        this.transactionTimestamp = transactionTimestamp;
+        this.amount = amount;
+        this.senderAccountNumber = senderAccountNumber;
+        this.receiverAccountNumber = receiverAccountNumber;
+        this.isActive = isActive;
+    }
 
-	public void setTransactionTimestamp(LocalDateTime transactionTimestamp) {
-		this.transactionTimestamp = transactionTimestamp;
-	}
+    // Getters and setters
 
-	public double getAmount() {
-		return amount;
-	}
+    public Long getTransactionId() {
+        return transactionId;
+    }
 
-	public void setAmount(double amount) {
-		this.amount = amount;
-	}
+    public void setTransactionId(Long transactionId) {
+        this.transactionId = transactionId;
+    }
 
-	public Account getSenderAccountNumber() {
-		return senderAccountNumber;
-	}
+    public LocalDateTime getTransactionTimestamp() {
+        return transactionTimestamp;
+    }
 
-	public void setSenderAccountNumber(Account senderAccountNumber) {
-		this.senderAccountNumber = senderAccountNumber;
-	}
+    public void setTransactionTimestamp(LocalDateTime transactionTimestamp) {
+        this.transactionTimestamp = transactionTimestamp;
+    }
 
-	public Account getReceiverAccountNumber() {
-		return receiverAccountNumber;
-	}
+    public double getAmount() {
+        return amount;
+    }
 
-	public void setReceiverAccountNumber(Account receiverAccountNumber) {
-		this.receiverAccountNumber = receiverAccountNumber;
-	}
+    public void setAmount(double amount) {
+        this.amount = amount;
+    }
 
-	public Transaction(Long transactionId, LocalDateTime transactionTimestamp, @NotNull double amount,
-			Account senderAccountNumber, Account receiverAccountNumber) {
-		super();
-		this.transactionId = transactionId;
-		this.transactionTimestamp = transactionTimestamp;
-		this.amount = amount;
-		this.senderAccountNumber = senderAccountNumber;
-		this.receiverAccountNumber = receiverAccountNumber;
-	}
+    public Account getSenderAccountNumber() {
+        return senderAccountNumber;
+    }
 
-	public Transaction() {
+    public void setSenderAccountNumber(Account senderAccountNumber) {
+        this.senderAccountNumber = senderAccountNumber;
+    }
 
-	}
+    public Account getReceiverAccountNumber() {
+        return receiverAccountNumber;
+    }
 
+    public void setReceiverAccountNumber(Account receiverAccountNumber) {
+        this.receiverAccountNumber = receiverAccountNumber;
+    }
+
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
+    }
 }

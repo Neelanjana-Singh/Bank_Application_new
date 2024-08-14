@@ -7,25 +7,33 @@ import com.techlabs.app.entity.Customer;
 import com.techlabs.app.exception.ResourceNotFoundException;
 import com.techlabs.app.repository.AccountRepository;
 import com.techlabs.app.repository.CustomerRepository;
+import com.techlabs.app.util.PagedResponse;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.sql.DataSource;
 
 @Service
+
 public class CustomerServiceImpl implements CustomerService {
 
+	private static final Logger logger = LoggerFactory.getLogger(CustomerServiceImpl.class);
 	@Autowired
 	private CustomerRepository customerRepository;
 
 	@Autowired
 	private AccountRepository accountRepository;
 	@Autowired
-	private  DataSource dataSource;
+	private DataSource dataSource;
 
-	
 	public CustomerServiceImpl(CustomerRepository customerRepository, AccountRepository accountRepository,
 			DataSource dataSource) {
 		super();
@@ -93,6 +101,24 @@ public class CustomerServiceImpl implements CustomerService {
 		double totalBalance = customer.getAccounts().stream().mapToDouble(Account::getBalance).sum();
 		customer.setTotalBalance(totalBalance);
 		customerRepository.save(customer);
+	}
+
+	@Override
+	public void deactivate(Long customerId) {
+		Customer customer = customerRepository.findById(customerId)
+				.orElseThrow(() -> new ResourceNotFoundException("Customer not found"));
+		customer.setActive(false); // Set isActive to false
+		customerRepository.save(customer);
+	}
+
+	@Override
+	public PagedResponse<CustomerResponseDTO> getAllCustomers(int page, int size) {
+		PageRequest pageRequest = PageRequest.of(page, size);
+		Page<Customer> customersPage = customerRepository.findAll(pageRequest);
+
+		return new PagedResponse<>(customersPage.getContent().stream().map(this::mapToDTO).collect(Collectors.toList()),
+				customersPage.getNumber(), customersPage.getSize(), customersPage.getTotalElements(),
+				customersPage.getTotalPages(), customersPage.isLast());
 	}
 
 	private CustomerResponseDTO mapToDTO(Customer customer) {

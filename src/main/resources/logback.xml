@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<!-- Define the pattern for log messages -->
+	<property name="LOG_PATTERN"
+		value="%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %msg%n" />
+
+	<!-- Console appender configuration -->
+	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>${LOG_PATTERN}</pattern>
+		</encoder>
+	</appender>
+
+	<!-- File appender configuration -->
+	<appender name="FILE"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<!-- Log file location -->
+		<file>logs/app.log</file>
+		<rollingPolicy
+			class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<!-- Log file will be archived daily -->
+			<fileNamePattern>logs/app.%d{yyyy-MM-dd}.log</fileNamePattern>
+			<!-- Retain log files for 30 days -->
+			<maxHistory>30</maxHistory>
+		</rollingPolicy>
+		<encoder>
+			<pattern>${LOG_PATTERN}</pattern>
+		</encoder>
+	</appender>
+
+	<!-- Root logger configuration -->
+	<root level="info">
+		<!-- Log to console -->
+		<appender-ref ref="CONSOLE" />
+		<!-- Log to file -->
+		<appender-ref ref="FILE" />
+	</root>
+
+
+</configuration>

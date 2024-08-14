@@ -9,88 +9,101 @@ import java.util.List;
 @Table(name = "customers")
 public class Customer {
 
-	@Id
-	private Long customerId;
+    @Id
+    private Long customerId;
 
-	@NotBlank
-	@Column(nullable = false)
-	private String firstName;
+    @NotBlank
+    @Column(nullable = false)
+    private String firstName;
 
-	@NotBlank
-	@Column(nullable = false)
-	private String lastName;
+    @NotBlank
+    @Column(nullable = false)
+    private String lastName;
 
-	private double totalBalance;
+    @Column(nullable = false)
+    private double totalBalance;
 
-	@OneToOne
-	@MapsId
-	@JoinColumn(name = "customerId")
-	private User user;
+    @Column(nullable = false)
+    private boolean isActive;
 
-	@OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Account> accounts;
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "customerId")
+    private User user;
 
-	public Long getCustomerId() {
-		return customerId;
-	}
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Account> accounts;
 
-	public void setCustomerId(Long customerId) {
-		this.customerId = customerId;
-	}
+    // Getters and Setters
 
-	public String getFirstName() {
-		return firstName;
-	}
+    public Long getCustomerId() {
+        return customerId;
+    }
 
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
+    public void setCustomerId(Long customerId) {
+        this.customerId = customerId;
+    }
 
-	public String getLastName() {
-		return lastName;
-	}
+    public String getFirstName() {
+        return firstName;
+    }
 
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
 
-	public double getTotalBalance() {
-		return totalBalance;
-	}
+    public String getLastName() {
+        return lastName;
+    }
 
-	public void setTotalBalance(double totalBalance) {
-		this.totalBalance = totalBalance;
-	}
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
 
-	public User getUser() {
-		return user;
-	}
+    public double getTotalBalance() {
+        return totalBalance;
+    }
 
-	public void setUser(User user) {
-		this.user = user;
-	}
+    public void setTotalBalance(double totalBalance) {
+        this.totalBalance = totalBalance;
+    }
 
-	public List<Account> getAccounts() {
-		return accounts;
-	}
+    public boolean isActive() {
+        return isActive;
+    }
 
-	public void setAccounts(List<Account> accounts) {
-		this.accounts = accounts;
-	}
+    public void setActive(boolean isActive) {
+        this.isActive = isActive;
+    }
 
-	public Customer(Long customerId, @NotBlank String firstName, @NotBlank String lastName, double totalBalance,
-			User user, List<Account> accounts) {
-		super();
-		this.customerId = customerId;
-		this.firstName = firstName;
-		this.lastName = lastName;
-		this.totalBalance = totalBalance;
-		this.user = user;
-		this.accounts = accounts;
-	}
+    public User getUser() {
+        return user;
+    }
 
-	public Customer() {
+    public void setUser(User user) {
+        this.user = user;
+    }
 
-	}
+    public List<Account> getAccounts() {
+        return accounts;
+    }
 
+    public void setAccounts(List<Account> accounts) {
+        this.accounts = accounts;
+    }
+
+    // Constructor with isActive parameter
+    public Customer(Long customerId, @NotBlank String firstName, @NotBlank String lastName, double totalBalance, boolean isActive, User user, List<Account> accounts) {
+        this.customerId = customerId;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.totalBalance = totalBalance;
+        this.isActive = isActive;
+        this.user = user;
+        this.accounts = accounts;
+    }
+
+    // Default Constructor
+    public Customer() {
+    }
 }

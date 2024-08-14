@@ -8,6 +8,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -43,32 +44,42 @@ public class SecurityConfig {
 
 	@Bean
 	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		http.csrf(csrf -> csrf.disable()).authorizeHttpRequests(authorize -> authorize
-				// Admin endpoints
-				.requestMatchers(HttpMethod.POST, "/api/accounts/**").hasRole("ADMIN")
-				.requestMatchers(HttpMethod.DELETE, "/api/accounts/**").hasRole("ADMIN")
-				.requestMatchers(HttpMethod.PUT, "/api/accounts/**").hasRole("ADMIN")
-				.requestMatchers(HttpMethod.POST, "/api/banks/**").hasRole("ADMIN")
-				.requestMatchers(HttpMethod.DELETE, "/api/banks/**").hasRole("ADMIN")
-				.requestMatchers(HttpMethod.PUT, "/api/banks/**").hasRole("ADMIN")
-				.requestMatchers(HttpMethod.DELETE, "/api/customers/**").hasRole("ADMIN")
+		http.csrf(csrf -> csrf.disable())
+				.authorizeHttpRequests(authorize -> authorize
+						.requestMatchers( "/swagger-ui/**", "/v3/api-docs/**").permitAll()
+						
+						// Admin endpoints
+						.requestMatchers(HttpMethod.POST, "/api/accounts/**").hasRole("ADMIN")
+						.requestMatchers(HttpMethod.DELETE, "/api/accounts/**").hasRole("ADMIN")
+						.requestMatchers(HttpMethod.PUT, "/api/accounts/**").hasRole("ADMIN")
+						.requestMatchers(HttpMethod.POST, "/api/banks/**").hasRole("ADMIN")
+						.requestMatchers(HttpMethod.DELETE, "/api/banks/**").hasRole("ADMIN")
+						.requestMatchers(HttpMethod.PUT, "/api/banks/**").hasRole("ADMIN")
+						.requestMatchers(HttpMethod.DELETE, "/api/customers/**").hasRole("ADMIN")
+						.requestMatchers(HttpMethod.GET, "/api/transactions/all/**").hasRole("ADMIN")
+						.requestMatchers(HttpMethod.GET, "/api/transactions/dates/**").hasRole("ADMIN")
+						// Customer endpoints
+						.requestMatchers(HttpMethod.GET, "/api/transactions/{id}").hasRole("CUSTOMER")
+						.requestMatchers(HttpMethod.POST, "/api/transactions").hasRole("CUSTOMER")
+						.requestMatchers(HttpMethod.PUT, "/api/transactions/{id}").hasRole("CUSTOMER")
+						.requestMatchers(HttpMethod.DELETE, "/api/transactions/{id}").hasRole("CUSTOMER")
+						.requestMatchers(HttpMethod.POST, "/api/banks/deposit").hasRole("CUSTOMER")
+						.requestMatchers(HttpMethod.POST, "/api/banks/withdraw").hasRole("CUSTOMER")
 
-				// Customer endpoints
-				.requestMatchers(HttpMethod.GET, "/api/transactions/{id}").hasRole("CUSTOMER")
-				.requestMatchers(HttpMethod.POST, "/api/transactions").hasRole("CUSTOMER")
-				.requestMatchers(HttpMethod.PUT, "/api/transactions/{id}").hasRole("CUSTOMER")
-				.requestMatchers(HttpMethod.DELETE, "/api/transactions/{id}").hasRole("CUSTOMER")
-				.requestMatchers(HttpMethod.POST, "/api/banks/deposit").hasRole("CUSTOMER")
-				.requestMatchers(HttpMethod.POST, "/api/banks/withdraw").hasRole("CUSTOMER")
-
-				// Public endpoints
-				.requestMatchers("/api/auth/**").permitAll().anyRequest().authenticated())
+						// Public endpoints
+						.requestMatchers("/api/auth/**").permitAll().anyRequest().authenticated())
 				.exceptionHandling(exception -> exception.authenticationEntryPoint(authenticationEntryPoint))
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
 		http.addFilterBefore(authenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
 		return http.build();
+		
 	}
+	@Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring()
+            .requestMatchers("/swagger-ui/**", "/v3/api-docs/**");
+    }
 
 }

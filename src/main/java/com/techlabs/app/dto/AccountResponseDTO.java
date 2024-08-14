@@ -5,23 +5,23 @@ public class AccountResponseDTO {
 	private double balance;
 	private Long customerId;
 	private Long bankId;
+	private boolean isActive; // Newly added variable
 
 	// No-args constructor
 	public AccountResponseDTO() {
 	}
 
 	// All-args constructor
-	public AccountResponseDTO(Long accountNumber, double balance, Long customerId, Long bankId) {
+	public AccountResponseDTO(Long accountNumber, double balance, Long customerId, Long bankId, boolean isActive) {
 		this.accountNumber = accountNumber;
 		this.balance = balance;
 		this.customerId = customerId;
 		this.bankId = bankId;
+		this.isActive = isActive;
 	}
 
-	
-
+	// Constructor with partial fields
 	public AccountResponseDTO(Long accountNumber, double balance) {
-		super();
 		this.accountNumber = accountNumber;
 		this.balance = balance;
 	}
@@ -43,6 +43,10 @@ public class AccountResponseDTO {
 		return bankId;
 	}
 
+	public boolean isActive() {
+		return isActive;
+	}
+
 	// Setters
 	public void setAccountNumber(Long accountNumber) {
 		this.accountNumber = accountNumber;
@@ -58,5 +62,9 @@ public class AccountResponseDTO {
 
 	public void setBankId(Long bankId) {
 		this.bankId = bankId;
+	}
+
+	public void setActive(boolean isActive) {
+		this.isActive = isActive;
 	}
 }

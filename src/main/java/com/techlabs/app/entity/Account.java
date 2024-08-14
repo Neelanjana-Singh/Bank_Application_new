@@ -8,88 +8,100 @@ import java.util.List;
 @Table(name = "accounts")
 public class Account {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long accountNumber;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long accountNumber;
 
-	@Column(nullable = false)
-	private double balance;
+    @Column(nullable = false)
+    private double balance;
 
-	@ManyToOne
-	@JoinColumn(name = "customer_id")
-	private Customer customer;
+    @Column(nullable = false)
+    private boolean isActive;
 
-	@ManyToOne
-	@JoinColumn(name = "bank_id")
-	private Bank bank;
+    @ManyToOne
+    @JoinColumn(name = "customer_id")
+    private Customer customer;
 
-	@OneToMany(mappedBy = "senderAccountNumber", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Transaction> sentTransactions;
+    @ManyToOne
+    @JoinColumn(name = "bank_id")
+    private Bank bank;
 
-	@OneToMany(mappedBy = "receiverAccountNumber", cascade = CascadeType.ALL, orphanRemoval = true)
-	private List<Transaction> receivedTransactions;
+    @OneToMany(mappedBy = "senderAccountNumber", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Transaction> sentTransactions;
 
-	public Long getAccountNumber() {
-		return accountNumber;
-	}
+    @OneToMany(mappedBy = "receiverAccountNumber", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Transaction> receivedTransactions;
 
-	public void setAccountNumber(Long accountNumber) {
-		this.accountNumber = accountNumber;
-	}
+    // Getters and Setters
 
-	public double getBalance() {
-		return balance;
-	}
+    public Long getAccountNumber() {
+        return accountNumber;
+    }
 
-	public void setBalance(double balance) {
-		this.balance = balance;
-	}
+    public void setAccountNumber(Long accountNumber) {
+        this.accountNumber = accountNumber;
+    }
 
-	public Customer getCustomer() {
-		return customer;
-	}
+    public double getBalance() {
+        return balance;
+    }
 
-	public void setCustomer(Customer customer) {
-		this.customer = customer;
-	}
+    public void setBalance(double balance) {
+        this.balance = balance;
+    }
 
-	public Bank getBank() {
-		return bank;
-	}
+    public boolean isActive() {
+        return isActive;
+    }
 
-	public void setBank(Bank bank) {
-		this.bank = bank;
-	}
+    public void setActive(boolean isActive) {
+        this.isActive = isActive;
+    }
 
-	public List<Transaction> getSentTransactions() {
-		return sentTransactions;
-	}
+    public Customer getCustomer() {
+        return customer;
+    }
 
-	public void setSentTransactions(List<Transaction> sentTransactions) {
-		this.sentTransactions = sentTransactions;
-	}
+    public void setCustomer(Customer customer) {
+        this.customer = customer;
+    }
 
-	public List<Transaction> getReceivedTransactions() {
-		return receivedTransactions;
-	}
+    public Bank getBank() {
+        return bank;
+    }
 
-	public void setReceivedTransactions(List<Transaction> receivedTransactions) {
-		this.receivedTransactions = receivedTransactions;
-	}
+    public void setBank(Bank bank) {
+        this.bank = bank;
+    }
 
-	public Account(Long accountNumber, double balance, Customer customer, Bank bank, List<Transaction> sentTransactions,
-			List<Transaction> receivedTransactions) {
-		super();
-		this.accountNumber = accountNumber;
-		this.balance = balance;
-		this.customer = customer;
-		this.bank = bank;
-		this.sentTransactions = sentTransactions;
-		this.receivedTransactions = receivedTransactions;
-	}
+    public List<Transaction> getSentTransactions() {
+        return sentTransactions;
+    }
 
-	public Account() {
+    public void setSentTransactions(List<Transaction> sentTransactions) {
+        this.sentTransactions = sentTransactions;
+    }
 
-	}
+    public List<Transaction> getReceivedTransactions() {
+        return receivedTransactions;
+    }
 
+    public void setReceivedTransactions(List<Transaction> receivedTransactions) {
+        this.receivedTransactions = receivedTransactions;
+    }
+
+    // Constructor with isActive parameter
+    public Account(Long accountNumber, double balance, boolean isActive, Customer customer, Bank bank, List<Transaction> sentTransactions, List<Transaction> receivedTransactions) {
+        this.accountNumber = accountNumber;
+        this.balance = balance;
+        this.isActive = isActive;
+        this.customer = customer;
+        this.bank = bank;
+        this.sentTransactions = sentTransactions;
+        this.receivedTransactions = receivedTransactions;
+    }
+
+    // Default Constructor
+    public Account() {
+    }
 }

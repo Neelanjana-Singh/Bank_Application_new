@@ -21,6 +21,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -29,6 +30,7 @@ import java.util.Set;
 
 @Service
 public class AuthServiceImpl implements AuthService {
+
 	@Autowired
 	private UserRepository userRepository;
 
@@ -50,60 +52,66 @@ public class AuthServiceImpl implements AuthService {
 	@Autowired
 	private AdminRepository adminRepository;
 
+	@Autowired
+	private FileService fileService;
+	
+	@Autowired
+	private EmailService emailService;
+
 	@Override
 	public String login(LoginDTO loginDTO) {
-		Authentication authentication = authenticationManager
-				.authenticate(new UsernamePasswordAuthenticationToken(loginDTO.getUsername(), loginDTO.getPassword()));
-		SecurityContextHolder.getContext().setAuthentication(authentication);
-		String token = jwtTokenProvider.generateToken(authentication);
-
-		return token;
+		try {
+			Authentication authentication = authenticationManager.authenticate(
+					new UsernamePasswordAuthenticationToken(loginDTO.getUsername(), loginDTO.getPassword()));
+			SecurityContextHolder.getContext().setAuthentication(authentication);
+			return jwtTokenProvider.generateToken(authentication);
+		} catch (Exception e) {
+			throw new RuntimeException("Authentication failed", e);
+		}
 	}
 
 	@Override
-	public String register(RegisterDTO registerDTO, String role) {
+	public String register(RegisterDTO registerDTO, String role, MultipartFile file1, MultipartFile file2) {
+	    // Validate input
+	    if (registerDTO.getEmail() == null || registerDTO.getEmail().trim().isEmpty()) {
+	        throw new IllegalArgumentException("Email must not be blank");
+	    }
+
 	    // Check if username already exists
-	    if (userRepository.existsByUsername(registerDTO.getUsername()) && role.equals("ROLE_CUSTOMER")) {
-	        throw new CustomerRelatedException(
-	                "Customer with the Username : " + registerDTO.getUsername() + " already exists");
+	    if (userRepository.existsByUsername(registerDTO.getUsername())) {
+	        if (role.equals("ROLE_CUSTOMER")) {
+	            throw new CustomerRelatedException(
+	                    "Customer with the Username : " + registerDTO.getUsername() + " already exists");
+	        } else if (role.equals("ROLE_ADMIN")) {
+	            throw new AdminRelatedException(
+	                    "Admin with the Username : " + registerDTO.getUsername() + " already exists");
+	        }
 	    }
 
-	    if (userRepository.existsByUsername(registerDTO.getUsername()) && role.equals("ROLE_ADMIN")) {
-	        throw new AdminRelatedException(
-	                "Admin with the Username : " + registerDTO.getUsername() + " already exists");
-	    }
-
-	    // Create and populate User entity
 	    User user = new User();
 	    user.setFirstName(registerDTO.getFirstName());
 	    user.setLastName(registerDTO.getLastName());
 	    user.setUsername(registerDTO.getUsername());
 	    user.setPassword(passwordEncoder.encode(registerDTO.getPassword()));
-
-	    // Validate email field
-	    if (registerDTO.getEmail() == null || registerDTO.getEmail().trim().isEmpty()) {
-	        throw new IllegalArgumentException("Email must not be blank");
-	    }
 	    user.setEmail(registerDTO.getEmail());
-
-	    // Create and link Customer or Admin entity based on role
+	    
+	    Admin admin = new Admin();
 	    if (role.equals("ROLE_ADMIN")) {
-	        Admin admin = new Admin();
-	        admin.setFirstName(registerDTO.getFirstName());
-	        admin.setLastName(registerDTO.getLastName());
+	        admin.setFirstName(user.getFirstName());
+	        admin.setLastName(user.getLastName());
 	        admin.setUser(user);
 	        user.setAdmin(admin);
-	        adminRepository.save(admin);
-	    } else {
-	        Customer customer = new Customer();
-	        customer.setFirstName(registerDTO.getFirstName());
-	        customer.setLastName(registerDTO.getLastName());
+	    }
+	    
+	    Customer customer = new Customer();
+	    if (role.equals("ROLE_CUSTOMER")) {
+	        customer.setFirstName(user.getFirstName());
+	        customer.setLastName(user.getLastName());
 	        customer.setUser(user);
-	        List<Account> accounts = new ArrayList<>();
-	        customer.setAccounts(accounts);
 	        customer.setTotalBalance(0);
+	        customer.setActive(true); 
+	        customer.setAccounts(new ArrayList<>());
 	        user.setCustomer(customer);
-	        customerRepository.save(customer);
 	    }
 
 	    // Set roles and save user
@@ -111,7 +119,25 @@ public class AuthServiceImpl implements AuthService {
 	    Role newRole = roleRepository.findByName(role).orElseThrow(() -> new RuntimeException("Role Not Found"));
 	    roles.add(newRole);
 	    user.setRoles(roles);
-	    userRepository.save(user);
+	    User savedUser = userRepository.save(user);
+	    
+	    if (role.equals("ROLE_ADMIN")) {
+	        adminRepository.save(admin);
+	    }
+
+	    if (role.equals("ROLE_CUSTOMER")) {
+	        customerRepository.save(customer);
+	    }
+
+	    fileService.uploadFile(file1, savedUser.getUserId());
+	    fileService.uploadFile(file2, savedUser.getUserId());
+
+	    // Send email notification after successful registration
+	    if (role.equals("ROLE_CUSTOMER")) {
+	        String text = "Creation of account";
+	        String message = "Account created successfully";
+	        emailService.sendMail(customer.getUser().getEmail(), text, message);
+	    }
 
 	    return "Registration successful for role : " + role.substring(5);
 	}
